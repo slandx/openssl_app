@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="apps.h" />
+    <ClInclude Include="e_os.h" />
+    <ClInclude Include="progs.h" />
+    <ClInclude Include="s_apps.h" />
+    <ClInclude Include="testdsa.h" />
+    <ClInclude Include="testrsa.h" />
+    <ClInclude Include="timeouts.h" />
+    <ClInclude Include="tlhelp32.h" />
+    <ClInclude Include="uplink.h" />
+    <ClInclude Include="vms_term_sock.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="applink.c" />
+    <ClCompile Include="apps.c" />
+    <ClCompile Include="app_rand.c" />
+    <ClCompile Include="asn1pars.c" />
+    <ClCompile Include="ca.c" />
+    <ClCompile Include="ciphers.c" />
+    <ClCompile Include="cms.c" />
+    <ClCompile Include="crl.c" />
+    <ClCompile Include="crl2p7.c" />
+    <ClCompile Include="dgst.c" />
+    <ClCompile Include="dhparam.c" />
+    <ClCompile Include="dsa.c" />
+    <ClCompile Include="dsaparam.c" />
+    <ClCompile Include="ec.c" />
+    <ClCompile Include="ecparam.c" />
+    <ClCompile Include="enc.c" />
+    <ClCompile Include="engine.c" />
+    <ClCompile Include="errstr.c" />
+    <ClCompile Include="gendsa.c" />
+    <ClCompile Include="genpkey.c" />
+    <ClCompile Include="genrsa.c" />
+    <ClCompile Include="nseq.c" />
+    <ClCompile Include="ocsp.c" />
+    <ClCompile Include="openssl.c" />
+    <ClCompile Include="opt.c" />
+    <ClCompile Include="passwd.c" />
+    <ClCompile Include="pkcs12.c" />
+    <ClCompile Include="pkcs7.c" />
+    <ClCompile Include="pkcs8.c" />
+    <ClCompile Include="pkey.c" />
+    <ClCompile Include="pkeyparam.c" />
+    <ClCompile Include="pkeyutl.c" />
+    <ClCompile Include="prime.c" />
+    <ClCompile Include="rand.c" />
+    <ClCompile Include="rehash.c" />
+    <ClCompile Include="req.c" />
+    <ClCompile Include="rsa.c" />
+    <ClCompile Include="rsautl.c" />
+    <ClCompile Include="sess_id.c" />
+    <ClCompile Include="smime.c" />
+    <ClCompile Include="speed.c" />
+    <ClCompile Include="spkac.c" />
+    <ClCompile Include="srp.c" />
+    <ClCompile Include="s_cb.c" />
+    <ClCompile Include="s_client.c" />
+    <ClCompile Include="s_server.c" />
+    <ClCompile Include="s_socket.c" />
+    <ClCompile Include="s_time.c" />
+    <ClCompile Include="ts.c" />
+    <ClCompile Include="uplink.c" />
+    <ClCompile Include="verify.c" />
+    <ClCompile Include="version.c" />
+    <ClCompile Include="vms_decc_init.c" />
+    <ClCompile Include="vms_term_sock.c" />
+    <ClCompile Include="win32_init.c" />
+    <ClCompile Include="x509.c" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6A36CCB4-A9D6-4726-A40E-8B1FF99E89B2}</ProjectGuid>
+    <RootNamespace>openssl_app</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>false</SDLCheck>
+      <AdditionalIncludeDirectories>D:\dev_evn\openssl\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>D:\dev_evn\openssl</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libcrypto.lib;libssl.lib;ws2_32.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>false</SDLCheck>
+      <AdditionalIncludeDirectories>D:\dev_evn\openssl\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>D:\dev_evn\openssl</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libcrypto.lib;libssl.lib;ws2_32.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

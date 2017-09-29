@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="e_os.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="progs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="s_apps.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="testdsa.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="testrsa.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="timeouts.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="vms_term_sock.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="apps.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="uplink.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tlhelp32.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="app_rand.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="apps.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="asn1pars.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ca.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ciphers.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="cms.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="crl.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="crl2p7.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dgst.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dhparam.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dsa.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dsaparam.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ec.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ecparam.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="enc.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="engine.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="errstr.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="gendsa.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="genpkey.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="genrsa.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="nseq.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ocsp.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="openssl.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="opt.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="passwd.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pkcs7.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pkcs8.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pkcs12.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pkey.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pkeyparam.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="pkeyutl.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="prime.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="rand.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="rehash.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="req.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="rsa.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="rsautl.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="s_cb.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="s_client.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="s_server.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="s_socket.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="s_time.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="sess_id.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="smime.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="speed.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="spkac.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="srp.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ts.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="verify.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="version.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="vms_decc_init.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="vms_term_sock.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="win32_init.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="x509.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="applink.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="uplink.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
