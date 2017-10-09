@@ -15,42 +15,43 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="e_os.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="progs.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="s_apps.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="testdsa.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="testrsa.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="timeouts.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="vms_term_sock.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="apps.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="uplink.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="tlhelp32.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="app_rand.c">
+    <ClCompile Include="s_socket.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="s_time.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="sess_id.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="smime.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="speed.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="spkac.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="strtonum.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ts.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="verify.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="version.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="x509.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="apps.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="apps_win.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="asn1pars.c">
@@ -59,10 +60,10 @@
     <ClCompile Include="ca.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="ciphers.c">
+    <ClCompile Include="certhash_win.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="cms.c">
+    <ClCompile Include="ciphers.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="crl.c">
@@ -72,6 +73,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="dgst.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dh.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="dhparam.c">
@@ -92,10 +96,10 @@
     <ClCompile Include="enc.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="engine.c">
+    <ClCompile Include="errstr.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="errstr.c">
+    <ClCompile Include="gendh.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="gendsa.c">
@@ -114,9 +118,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="openssl.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="opt.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="passwd.c">
@@ -140,13 +141,13 @@
     <ClCompile Include="pkeyutl.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="poll_win.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="prime.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="rand.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="rehash.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="req.c">
@@ -167,53 +168,25 @@
     <ClCompile Include="s_server.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="s_socket.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="s_time.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="sess_id.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="smime.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="speed.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="spkac.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="srp.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ts.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="verify.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="version.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="vms_decc_init.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="vms_term_sock.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="win32_init.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="x509.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="applink.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="uplink.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="progs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="s_apps.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="testdsa.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="testrsa.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="timeouts.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="apps.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

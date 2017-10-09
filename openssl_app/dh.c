@@ -1,4 +1,4 @@
-/* $OpenBSD: pkcs7.c,v 1.9 2017/01/20 08:57:12 deraadt Exp $ */
+/* $OpenBSD: dh.c,v 1.9 2017/01/20 08:57:11 deraadt Exp $ */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
  *
@@ -56,6 +56,10 @@
  * [including the GNU Public Licence.]
  */
 
+#include <openssl/opensslconf.h>	/* for OPENSSL_NO_DH */
+
+#ifndef OPENSSL_NO_DH
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -63,96 +67,96 @@
 
 #include "apps.h"
 
+#include <openssl/bio.h>
+#include <openssl/bn.h>
 #include <openssl/err.h>
-#include <openssl/evp.h>
-#include <openssl/objects.h>
+#include <openssl/dh.h>
 #include <openssl/pem.h>
-#include <openssl/pkcs7.h>
 #include <openssl/x509.h>
 
 static struct {
+	int C;
+	int check;
 	char *infile;
 	int informat;
 	int noout;
 	char *outfile;
 	int outformat;
-	int p7_print;
-	int print_certs;
 	int text;
-} pkcs7_config;
+} dh_config;
 
-static struct option pkcs7_options[] = {
+static struct option dh_options[] = {
+	{
+		.name = "C",
+		.desc = "Convert DH parameters into C code",
+		.type = OPTION_FLAG,
+		.opt.flag = &dh_config.C,
+	},
+	{
+		.name = "check",
+		.desc = "Check the DH parameters",
+		.type = OPTION_FLAG,
+		.opt.flag = &dh_config.check,
+	},
 	{
 		.name = "in",
 		.argname = "file",
 		.desc = "Input file (default stdin)",
 		.type = OPTION_ARG,
-		.opt.arg = &pkcs7_config.infile,
+		.opt.arg = &dh_config.infile,
 	},
 	{
 		.name = "inform",
 		.argname = "format",
 		.desc = "Input format (DER or PEM (default))",
 		.type = OPTION_ARG_FORMAT,
-		.opt.value = &pkcs7_config.informat,
+		.opt.value = &dh_config.informat,
 	},
 	{
 		.name = "noout",
-		.desc = "Do not output encoded version of PKCS#7 structure",
+		.desc = "No output",
 		.type = OPTION_FLAG,
-		.opt.flag = &pkcs7_config.noout,
+		.opt.flag = &dh_config.noout,
 	},
 	{
 		.name = "out",
 		.argname = "file",
 		.desc = "Output file (default stdout)",
 		.type = OPTION_ARG,
-		.opt.arg = &pkcs7_config.outfile,
+		.opt.arg = &dh_config.outfile,
 	},
 	{
 		.name = "outform",
 		.argname = "format",
 		.desc = "Output format (DER or PEM (default))",
 		.type = OPTION_ARG_FORMAT,
-		.opt.value = &pkcs7_config.outformat,
-	},
-	{
-		.name = "print",
-		.desc = "Output ASN.1 representation of PKCS#7 structure",
-		.type = OPTION_FLAG,
-		.opt.flag = &pkcs7_config.p7_print,
-	},
-	{
-		.name = "print_certs",
-		.desc = "Print out any certificates or CRLs contained in file",
-		.type = OPTION_FLAG,
-		.opt.flag = &pkcs7_config.print_certs,
+		.opt.value = &dh_config.outformat,
 	},
 	{
 		.name = "text",
-		.desc = "Print out full certificate details",
+		.desc = "Print a text form of the DH parameters",
 		.type = OPTION_FLAG,
-		.opt.flag = &pkcs7_config.text,
+		.opt.flag = &dh_config.text,
 	},
 	{ NULL },
 };
 
 static void
-pkcs7_usage()
+dh_usage(void)
 {
-	fprintf(stderr, "usage: pkcs7 [-in file] "
-	    "[-inform DER | PEM] [-noout]\n"
-	    "    [-out file] [-outform DER | PEM] [-print_certs] [-text]\n\n");
-        options_usage(pkcs7_options);
+	fprintf(stderr,
+	    "usage: dh [-C] [-check] [-in file] [-inform format]\n"
+	    "    [-noout] [-out file] [-outform format] [-text]\n\n");
+	options_usage(dh_options);
 }
 
 int
-pkcs7_main(int argc, char **argv)
+dh_main(int argc, char **argv)
 {
-	PKCS7 *p7 = NULL;
+	DH *dh = NULL;
+	int i;
 	BIO *in = NULL, *out = NULL;
 	int ret = 1;
-	int i;
 
 	if (single_execution) {
 		if (pledge("stdio cpath wpath rpath", NULL) == -1) {
@@ -161,129 +165,136 @@ pkcs7_main(int argc, char **argv)
 		}
 	}
 
-	memset(&pkcs7_config, 0, sizeof(pkcs7_config));
+	memset(&dh_config, 0, sizeof(dh_config));
 
-	pkcs7_config.informat = FORMAT_PEM;
-	pkcs7_config.outformat = FORMAT_PEM;
+	dh_config.informat = FORMAT_PEM;
+	dh_config.outformat = FORMAT_PEM;
 
-	if (options_parse(argc, argv, pkcs7_options, NULL, NULL) != 0) {
-		pkcs7_usage();
+	if (options_parse(argc, argv, dh_options, NULL, NULL) != 0) {
+		dh_usage();
 		goto end;
 	}
 
 	in = BIO_new(BIO_s_file());
 	out = BIO_new(BIO_s_file());
-	if ((in == NULL) || (out == NULL)) {
+	if (in == NULL || out == NULL) {
 		ERR_print_errors(bio_err);
 		goto end;
 	}
-	if (pkcs7_config.infile == NULL)
+	if (dh_config.infile == NULL)
 		BIO_set_fp(in, stdin, BIO_NOCLOSE);
 	else {
-		if (BIO_read_filename(in, pkcs7_config.infile) <= 0) {
-			perror(pkcs7_config.infile);
+		if (BIO_read_filename(in, dh_config.infile) <= 0) {
+			perror(dh_config.infile);
+			goto end;
+		}
+	}
+	if (dh_config.outfile == NULL) {
+		BIO_set_fp(out, stdout, BIO_NOCLOSE);
+	} else {
+		if (BIO_write_filename(out, dh_config.outfile) <= 0) {
+			perror(dh_config.outfile);
 			goto end;
 		}
 	}
 
-	if (pkcs7_config.informat == FORMAT_ASN1)
-		p7 = d2i_PKCS7_bio(in, NULL);
-	else if (pkcs7_config.informat == FORMAT_PEM)
-		p7 = PEM_read_bio_PKCS7(in, NULL, NULL, NULL);
+	if (dh_config.informat == FORMAT_ASN1)
+		dh = d2i_DHparams_bio(in, NULL);
+	else if (dh_config.informat == FORMAT_PEM)
+		dh = PEM_read_bio_DHparams(in, NULL, NULL, NULL);
 	else {
-		BIO_printf(bio_err, "bad input format specified for pkcs7 object\n");
+		BIO_printf(bio_err, "bad input format specified\n");
 		goto end;
 	}
-	if (p7 == NULL) {
-		BIO_printf(bio_err, "unable to load PKCS7 object\n");
+	if (dh == NULL) {
+		BIO_printf(bio_err, "unable to load DH parameters\n");
 		ERR_print_errors(bio_err);
 		goto end;
 	}
-	if (pkcs7_config.outfile == NULL) {
-		BIO_set_fp(out, stdout, BIO_NOCLOSE);
-	} else {
-		if (BIO_write_filename(out, pkcs7_config.outfile) <= 0) {
-			perror(pkcs7_config.outfile);
+	if (dh_config.text) {
+		DHparams_print(out, dh);
+	}
+	if (dh_config.check) {
+		if (!DH_check(dh, &i)) {
+			ERR_print_errors(bio_err);
 			goto end;
 		}
+		if (i & DH_CHECK_P_NOT_PRIME)
+			printf("p value is not prime\n");
+		if (i & DH_CHECK_P_NOT_SAFE_PRIME)
+			printf("p value is not a safe prime\n");
+		if (i & DH_UNABLE_TO_CHECK_GENERATOR)
+			printf("unable to check the generator value\n");
+		if (i & DH_NOT_SUITABLE_GENERATOR)
+			printf("the g value is not a generator\n");
+		if (i == 0)
+			printf("DH parameters appear to be ok.\n");
 	}
+	if (dh_config.C) {
+		unsigned char *data;
+		int len, l, bits;
 
-	if (pkcs7_config.p7_print)
-		PKCS7_print_ctx(out, p7, 0, NULL);
-
-	if (pkcs7_config.print_certs) {
-		STACK_OF(X509) * certs = NULL;
-		STACK_OF(X509_CRL) * crls = NULL;
-
-		i = OBJ_obj2nid(p7->type);
-		switch (i) {
-		case NID_pkcs7_signed:
-			certs = p7->d.sign->cert;
-			crls = p7->d.sign->crl;
-			break;
-		case NID_pkcs7_signedAndEnveloped:
-			certs = p7->d.signed_and_enveloped->cert;
-			crls = p7->d.signed_and_enveloped->crl;
-			break;
-		default:
-			break;
+		len = BN_num_bytes(dh->p);
+		bits = BN_num_bits(dh->p);
+		data = malloc(len);
+		if (data == NULL) {
+			perror("malloc");
+			goto end;
 		}
-
-		if (certs != NULL) {
-			X509 *x;
-
-			for (i = 0; i < sk_X509_num(certs); i++) {
-				x = sk_X509_value(certs, i);
-				if (pkcs7_config.text)
-					X509_print(out, x);
-				else
-					dump_cert_text(out, x);
-
-				if (!pkcs7_config.noout)
-					PEM_write_bio_X509(out, x);
-				BIO_puts(out, "\n");
-			}
+		l = BN_bn2bin(dh->p, data);
+		printf("static unsigned char dh%d_p[] = {", bits);
+		for (i = 0; i < l; i++) {
+			if ((i % 12) == 0)
+				printf("\n\t");
+			printf("0x%02X, ", data[i]);
 		}
-		if (crls != NULL) {
-			X509_CRL *crl;
+		printf("\n\t};\n");
 
-			for (i = 0; i < sk_X509_CRL_num(crls); i++) {
-				crl = sk_X509_CRL_value(crls, i);
-
-				X509_CRL_print(out, crl);
-
-				if (!pkcs7_config.noout)
-					PEM_write_bio_X509_CRL(out, crl);
-				BIO_puts(out, "\n");
-			}
+		l = BN_bn2bin(dh->g, data);
+		printf("static unsigned char dh%d_g[] = {", bits);
+		for (i = 0; i < l; i++) {
+			if ((i % 12) == 0)
+				printf("\n\t");
+			printf("0x%02X, ", data[i]);
 		}
-		ret = 0;
-		goto end;
+		printf("\n\t};\n\n");
+
+		printf("DH *get_dh%d()\n\t{\n", bits);
+		printf("\tDH *dh;\n\n");
+		printf("\tif ((dh = DH_new()) == NULL) return(NULL);\n");
+		printf("\tdh->p = BN_bin2bn(dh%d_p, sizeof(dh%d_p), NULL);\n",
+		    bits, bits);
+		printf("\tdh->g = BN_bin2bn(dh%d_g, sizeof(dh%d_g), NULL);\n",
+		    bits, bits);
+		printf("\tif ((dh->p == NULL) || (dh->g == NULL))\n");
+		printf("\t\treturn(NULL);\n");
+		printf("\treturn(dh);\n\t}\n");
+		free(data);
 	}
-	if (!pkcs7_config.noout) {
-		if (pkcs7_config.outformat == FORMAT_ASN1)
-			i = i2d_PKCS7_bio(out, p7);
-		else if (pkcs7_config.outformat == FORMAT_PEM)
-			i = PEM_write_bio_PKCS7(out, p7);
+	if (!dh_config.noout) {
+		if (dh_config.outformat == FORMAT_ASN1)
+			i = i2d_DHparams_bio(out, dh);
+		else if (dh_config.outformat == FORMAT_PEM)
+			i = PEM_write_bio_DHparams(out, dh);
 		else {
 			BIO_printf(bio_err, "bad output format specified for outfile\n");
 			goto end;
 		}
-
 		if (!i) {
-			BIO_printf(bio_err, "unable to write pkcs7 object\n");
+			BIO_printf(bio_err, "unable to write DH parameters\n");
 			ERR_print_errors(bio_err);
 			goto end;
 		}
 	}
 	ret = 0;
+
 end:
-	if (p7 != NULL)
-		PKCS7_free(p7);
-	if (in != NULL)
-		BIO_free(in);
+	BIO_free(in);
 	if (out != NULL)
 		BIO_free_all(out);
+	if (dh != NULL)
+		DH_free(dh);
 
 	return (ret);
 }
+#endif

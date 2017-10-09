@@ -1,4 +1,4 @@
-/* $OpenBSD: errstr.c,v 1.6 2015/10/17 15:00:11 doug Exp $ */
+/* $OpenBSD: gendh.c,v 1.8 2017/01/20 08:57:12 deraadt Exp $ */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
  *
@@ -56,93 +56,162 @@
  * [including the GNU Public Licence.]
  */
 
+#include <openssl/opensslconf.h>
+
+/* Until the key-gen callbacks are modified to use newer prototypes, we allow
+ * deprecated functions for openssl-internal code */
+#ifdef OPENSSL_NO_DEPRECATED
+#undef OPENSSL_NO_DEPRECATED
+#endif
+
+#ifndef OPENSSL_NO_DH
+
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include <limits.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "apps.h"
 
 #include <openssl/bio.h>
+#include <openssl/bn.h>
+#include <openssl/dh.h>
 #include <openssl/err.h>
-#include <openssl/lhash.h>
-#include <openssl/ssl.h>
+#include <openssl/pem.h>
+#include <openssl/x509.h>
 
-struct {
-	int stats;
-} errstr_config;
+#define DEFBITS	512
 
-struct option errstr_options[] = {
+static int dh_cb(int p, int n, BN_GENCB * cb);
+
+static struct {
+	int g;
+	char *outfile;
+} gendh_config;
+
+static struct option gendh_options[] = {
 	{
-		.name = "stats",
-		.desc = "Print debugging statistics for the hash table",
-		.type = OPTION_FLAG,
-		.opt.flag = &errstr_config.stats,
+		.name = "2",
+		.desc = "Generate DH parameters with a generator value of 2 "
+		    "(default)",
+		.type = OPTION_VALUE,
+		.value = 2,
+		.opt.value = &gendh_config.g,
+	},
+	{
+		.name = "5",
+		.desc = "Generate DH parameters with a generator value of 5",
+		.type = OPTION_VALUE,
+		.value = 5,
+		.opt.value = &gendh_config.g,
+	},
+	{
+		.name = "out",
+		.argname = "file",
+		.desc = "Output file (default stdout)",
+		.type = OPTION_ARG,
+		.opt.arg = &gendh_config.outfile,
 	},
 	{ NULL },
 };
 
 static void
-errstr_usage()
+gendh_usage(void)
 {
-	fprintf(stderr, "usage: errstr [-stats] errno ...\n");
-	options_usage(errstr_options);
+	fprintf(stderr,
+	    "usage: gendh [-2 | -5] [-out file] [numbits]\n\n");
+	options_usage(gendh_options);
 }
 
 int
-errstr_main(int argc, char **argv)
+gendh_main(int argc, char **argv)
 {
-	unsigned long ulval;
-	char *ularg, *ep;
-	int argsused, i;
-	char buf[256];
-	int ret = 0;
+	BN_GENCB cb;
+	DH *dh = NULL;
+	int ret = 1, numbits = DEFBITS;
+	BIO *out = NULL;
+	char *strbits = NULL;
 
 	if (single_execution) {
-		if (pledge("stdio rpath", NULL) == -1) {
+		if (pledge("stdio cpath wpath rpath", NULL) == -1) {
 			perror("pledge");
 			exit(1);
 		}
 	}
 
-	memset(&errstr_config, 0, sizeof(errstr_config));
+	BN_GENCB_set(&cb, dh_cb, bio_err);
 
-	if (options_parse(argc, argv, errstr_options, NULL, &argsused) != 0) {
-		errstr_usage();
-		return (1);
+	memset(&gendh_config, 0, sizeof(gendh_config));
+
+	gendh_config.g = 2;
+
+	if (options_parse(argc, argv, gendh_options, &strbits, NULL) != 0) {
+		gendh_usage();
+		goto end;
 	}
 
-	if (errstr_config.stats) {
-		BIO *out;
-
-		if ((out = BIO_new_fp(stdout, BIO_NOCLOSE)) == NULL) {
-			fprintf(stderr, "Out of memory");
-			return (1);
+	if (strbits != NULL) {
+		const char *errstr;
+		numbits = strtonum(strbits, 0, INT_MAX, &errstr);
+		if (errstr) {
+			fprintf(stderr, "Invalid number of bits: %s\n", errstr);
+			goto end;
 		}
+	}
 
-		lh_ERR_STRING_DATA_node_stats_bio(ERR_get_string_table(), out);
-		lh_ERR_STRING_DATA_stats_bio(ERR_get_string_table(), out);
-		lh_ERR_STRING_DATA_node_usage_stats_bio(
-			    ERR_get_string_table(), out);
+	out = BIO_new(BIO_s_file());
+	if (out == NULL) {
+		ERR_print_errors(bio_err);
+		goto end;
+	}
+	if (gendh_config.outfile == NULL) {
+		BIO_set_fp(out, stdout, BIO_NOCLOSE);
+	} else {
+		if (BIO_write_filename(out, gendh_config.outfile) <= 0) {
+			perror(gendh_config.outfile);
+			goto end;
+		}
+	}
 
+	BIO_printf(bio_err, "Generating DH parameters, %d bit long safe prime,"
+	    " generator %d\n", numbits, gendh_config.g);
+	BIO_printf(bio_err, "This is going to take a long time\n");
+
+	if (((dh = DH_new()) == NULL) ||
+	    !DH_generate_parameters_ex(dh, numbits, gendh_config.g, &cb))
+		goto end;
+
+	if (!PEM_write_bio_DHparams(out, dh))
+		goto end;
+	ret = 0;
+end:
+	if (ret != 0)
+		ERR_print_errors(bio_err);
+	if (out != NULL)
 		BIO_free_all(out);
-	}
-
-	for (i = argsused; i < argc; i++) {
-		errno = 0;
-		ularg = argv[i];
-		ulval = strtoul(ularg, &ep, 16);
-		if (strchr(ularg, '-') != NULL ||
-		    (ularg[0] == '\0' || *ep != '\0') ||
-		    (errno == ERANGE && ulval == ULONG_MAX)) {
-			printf("%s: bad error code\n", ularg);
-			ret++;
-			continue;
-		}
-
-		ERR_error_string_n(ulval, buf, sizeof(buf));
-		printf("%s\n", buf);
-	}
+	if (dh != NULL)
+		DH_free(dh);
 
 	return (ret);
 }
+
+static int
+dh_cb(int p, int n, BN_GENCB * cb)
+{
+	char c = '*';
+
+	if (p == 0)
+		c = '.';
+	if (p == 1)
+		c = '+';
+	if (p == 2)
+		c = '*';
+	if (p == 3)
+		c = '\n';
+	BIO_write(cb->arg, &c, 1);
+	(void) BIO_flush(cb->arg);
+	return 1;
+}
+#endif

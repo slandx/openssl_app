@@ -19,43 +19,30 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="apps.h" />
-    <ClInclude Include="e_os.h" />
-    <ClInclude Include="progs.h" />
-    <ClInclude Include="s_apps.h" />
-    <ClInclude Include="testdsa.h" />
-    <ClInclude Include="testrsa.h" />
-    <ClInclude Include="timeouts.h" />
-    <ClInclude Include="tlhelp32.h" />
-    <ClInclude Include="uplink.h" />
-    <ClInclude Include="vms_term_sock.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="applink.c" />
     <ClCompile Include="apps.c" />
-    <ClCompile Include="app_rand.c" />
+    <ClCompile Include="apps_win.c" />
     <ClCompile Include="asn1pars.c" />
     <ClCompile Include="ca.c" />
+    <ClCompile Include="certhash_win.c" />
     <ClCompile Include="ciphers.c" />
-    <ClCompile Include="cms.c" />
     <ClCompile Include="crl.c" />
     <ClCompile Include="crl2p7.c" />
     <ClCompile Include="dgst.c" />
+    <ClCompile Include="dh.c" />
     <ClCompile Include="dhparam.c" />
     <ClCompile Include="dsa.c" />
     <ClCompile Include="dsaparam.c" />
     <ClCompile Include="ec.c" />
     <ClCompile Include="ecparam.c" />
     <ClCompile Include="enc.c" />
-    <ClCompile Include="engine.c" />
     <ClCompile Include="errstr.c" />
+    <ClCompile Include="gendh.c" />
     <ClCompile Include="gendsa.c" />
     <ClCompile Include="genpkey.c" />
     <ClCompile Include="genrsa.c" />
     <ClCompile Include="nseq.c" />
     <ClCompile Include="ocsp.c" />
     <ClCompile Include="openssl.c" />
-    <ClCompile Include="opt.c" />
     <ClCompile Include="passwd.c" />
     <ClCompile Include="pkcs12.c" />
     <ClCompile Include="pkcs7.c" />
@@ -63,9 +50,9 @@
     <ClCompile Include="pkey.c" />
     <ClCompile Include="pkeyparam.c" />
     <ClCompile Include="pkeyutl.c" />
+    <ClCompile Include="poll_win.c" />
     <ClCompile Include="prime.c" />
     <ClCompile Include="rand.c" />
-    <ClCompile Include="rehash.c" />
     <ClCompile Include="req.c" />
     <ClCompile Include="rsa.c" />
     <ClCompile Include="rsautl.c" />
@@ -73,20 +60,24 @@
     <ClCompile Include="smime.c" />
     <ClCompile Include="speed.c" />
     <ClCompile Include="spkac.c" />
-    <ClCompile Include="srp.c" />
+    <ClCompile Include="strtonum.c" />
     <ClCompile Include="s_cb.c" />
     <ClCompile Include="s_client.c" />
     <ClCompile Include="s_server.c" />
     <ClCompile Include="s_socket.c" />
     <ClCompile Include="s_time.c" />
     <ClCompile Include="ts.c" />
-    <ClCompile Include="uplink.c" />
     <ClCompile Include="verify.c" />
     <ClCompile Include="version.c" />
-    <ClCompile Include="vms_decc_init.c" />
-    <ClCompile Include="vms_term_sock.c" />
-    <ClCompile Include="win32_init.c" />
     <ClCompile Include="x509.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="apps.h" />
+    <ClInclude Include="progs.h" />
+    <ClInclude Include="s_apps.h" />
+    <ClInclude Include="testdsa.h" />
+    <ClInclude Include="testrsa.h" />
+    <ClInclude Include="timeouts.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6A36CCB4-A9D6-4726-A40E-8B1FF99E89B2}</ProjectGuid>
@@ -144,12 +135,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>D:\dev_evn\openssl\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\dev_evn\libressl-2.6.2\include;D:\dev_evn\libressl-2.6.2\include\compat</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;WIN32_LEAN_AND_MEAN;OPENSSL_NO_SPEED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>D:\dev_evn\openssl</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libssl.lib;ws2_32.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\dev_evn\libressl-2.6.2\build\vc14_x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>tls\Debug\tls.lib;ssl\Debug\ssl.lib;crypto\Debug\crypto.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -166,14 +157,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <AdditionalIncludeDirectories>D:\dev_evn\openssl\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_MBCS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\dev_evn\libressl-2.6.2\include;D:\dev_evn\libressl-2.6.2\include\compat</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_MBCS;WIN32_LEAN_AND_MEAN;OPENSSL_NO_SPEED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>D:\dev_evn\openssl</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libcrypto.lib;libssl.lib;ws2_32.lib;Crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\dev_evn\libressl-2.6.2\build\vc14_x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>tls\Release\tls.lib;ssl\Release\ssl.lib;crypto\Release\crypto.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

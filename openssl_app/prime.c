@@ -1,126 +1,199 @@
-/*
- * Copyright 2004-2016 The OpenSSL Project Authors. All Rights Reserved.
+/* $OpenBSD: prime.c,v 1.10 2015/10/17 15:00:11 doug Exp $ */
+/* ====================================================================
+ * Copyright (c) 2004 The OpenSSL Project.  All rights reserved.
  *
- * Licensed under the OpenSSL license (the "License").  You may not use
- * this file except in compliance with the License.  You can obtain a copy
- * in the file LICENSE in the source distribution or at
- * https://www.openssl.org/source/license.html
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ *
+ * 3. All advertising materials mentioning features or use of this
+ *    software must display the following acknowledgment:
+ *    "This product includes software developed by the OpenSSL Project
+ *    for use in the OpenSSL Toolkit. (http://www.openssl.org/)"
+ *
+ * 4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to
+ *    endorse or promote products derived from this software without
+ *    prior written permission. For written permission, please contact
+ *    openssl-core@openssl.org.
+ *
+ * 5. Products derived from this software may not be called "OpenSSL"
+ *    nor may "OpenSSL" appear in their names without prior written
+ *    permission of the OpenSSL Project.
+ *
+ * 6. Redistributions of any form whatsoever must retain the following
+ *    acknowledgment:
+ *    "This product includes software developed by the OpenSSL Project
+ *    for use in the OpenSSL Toolkit (http://www.openssl.org/)"
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY
+ * EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR
+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  */
 
 #include <string.h>
+#include <limits.h>
 
 #include "apps.h"
+
 #include <openssl/bn.h>
+#include <openssl/err.h>
 
-typedef enum OPTION_choice {
-    OPT_ERR = -1, OPT_EOF = 0, OPT_HELP,
-    OPT_HEX, OPT_GENERATE, OPT_BITS, OPT_SAFE, OPT_CHECKS
-} OPTION_CHOICE;
+struct {
+	int bits;
+	int checks;
+	int generate;
+	int hex;
+	int safe;
+} prime_config;
 
-OPTIONS prime_options[] = {
-    {OPT_HELP_STR, 1, '-', "Usage: %s [options] [number...]\n"},
-    {OPT_HELP_STR, 1, '-',
-        "  number Number to check for primality\n"},
-    {"help", OPT_HELP, '-', "Display this summary"},
-    {"hex", OPT_HEX, '-', "Hex output"},
-    {"generate", OPT_GENERATE, '-', "Generate a prime"},
-    {"bits", OPT_BITS, 'p', "Size of number in bits"},
-    {"safe", OPT_SAFE, '-',
-     "When used with -generate, generate a safe prime"},
-    {"checks", OPT_CHECKS, 'p', "Number of checks"},
-    {NULL}
+struct option prime_options[] = {
+	{
+		.name = "bits",
+		.argname = "n",
+		.desc = "Number of bits in the generated prime number",
+		.type = OPTION_ARG_INT,
+		.opt.value = &prime_config.bits,
+	},
+	{
+		.name = "checks",
+		.argname = "n",
+		.desc = "Miller-Rabin probablistic primality test iterations",
+		.type = OPTION_ARG_INT,
+		.opt.value = &prime_config.checks,
+	},
+	{
+		.name = "generate",
+		.desc = "Generate a pseudo-random prime number",
+		.type = OPTION_FLAG,
+		.opt.flag = &prime_config.generate,
+	},
+	{
+		.name = "hex",
+		.desc = "Hexadecimal prime numbers",
+		.type = OPTION_FLAG,
+		.opt.flag = &prime_config.hex,
+	},
+	{
+		.name = "safe",
+		.desc = "Generate only \"safe\" prime numbers",
+		.type = OPTION_FLAG,
+		.opt.flag = &prime_config.safe,
+	},
+	{NULL},
 };
 
-int prime_main(int argc, char **argv)
+static void
+prime_usage()
 {
-    BIGNUM *bn = NULL;
-    int hex = 0, checks = 20, generate = 0, bits = 0, safe = 0, ret = 1;
-    char *prog;
-    OPTION_CHOICE o;
+	fprintf(stderr,
+	    "usage: prime [-bits n] [-checks n] [-generate] [-hex] [-safe] "
+	    "p\n");
+	options_usage(prime_options);
+}
 
-    prog = opt_init(argc, argv, prime_options);
-    while ((o = opt_next()) != OPT_EOF) {
-        switch (o) {
-        case OPT_EOF:
-        case OPT_ERR:
-            BIO_printf(bio_err, "%s: Use -help for summary.\n", prog);
-            goto end;
-        case OPT_HELP:
-            opt_help(prime_options);
-            ret = 0;
-            goto end;
-        case OPT_HEX:
-            hex = 1;
-            break;
-        case OPT_GENERATE:
-            generate = 1;
-            break;
-        case OPT_BITS:
-            bits = atoi(opt_arg());
-            break;
-        case OPT_SAFE:
-            safe = 1;
-            break;
-        case OPT_CHECKS:
-            checks = atoi(opt_arg());
-            break;
-        }
-    }
-    argc = opt_num_rest();
-    argv = opt_rest();
+int
+prime_main(int argc, char **argv)
+{
+	BIGNUM *bn = NULL;
+	char *prime = NULL;
+	BIO *bio_out;
+	char *s;
+	int ret = 1;
 
-    if (argc == 0 && !generate) {
-        BIO_printf(bio_err, "%s: No prime specified\n", prog);
-        goto end;
-    }
+	if (single_execution) {
+		if (pledge("stdio rpath", NULL) == -1) {
+			perror("pledge");
+			exit(1);
+		}
+	}
 
-    if (generate) {
-        char *s;
+	memset(&prime_config, 0, sizeof(prime_config));
 
-        if (!bits) {
-            BIO_printf(bio_err, "Specify the number of bits.\n");
-            goto end;
-        }
-        bn = BN_new();
-        if (bn == NULL) {
-            BIO_printf(bio_err, "Out of memory.\n");
-            goto end;
-        }
-        if (!BN_generate_prime_ex(bn, bits, safe, NULL, NULL, NULL)) {
-            BIO_printf(bio_err, "Failed to generate prime.\n");
-            goto end;
-        }
-        s = hex ? BN_bn2hex(bn) : BN_bn2dec(bn);
-        if (s == NULL) {
-            BIO_printf(bio_err, "Out of memory.\n");
-            goto end;
-        }
-        BIO_printf(bio_out, "%s\n", s);
-        OPENSSL_free(s);
-    } else {
-        for ( ; *argv; argv++) {
-            int r;
+	/* Default iterations for Miller-Rabin probabilistic primality test. */
+	prime_config.checks = 20;
 
-            if (hex)
-                r = BN_hex2bn(&bn, argv[0]);
-            else
-                r = BN_dec2bn(&bn, argv[0]);
+	if (options_parse(argc, argv, prime_options, &prime, NULL) != 0) {
+		prime_usage();
+		return (1);
+	}
 
-            if(!r) {
-                BIO_printf(bio_err, "Failed to process value (%s)\n", argv[0]);
-                goto end;
-            }
+	if (prime == NULL && prime_config.generate == 0) {
+		BIO_printf(bio_err, "No prime specified.\n");
+		prime_usage();
+		return (1);
+	}
 
-            BN_print(bio_out, bn);
-            BIO_printf(bio_out, " (%s) %s prime\n",
-                       argv[0],
-                       BN_is_prime_ex(bn, checks, NULL, NULL)
-                           ? "is" : "is not");
-        }
-    }
+	if ((bio_out = BIO_new(BIO_s_file())) == NULL) {
+		ERR_print_errors(bio_err);
+		return (1);
+	}
+	BIO_set_fp(bio_out, stdout, BIO_NOCLOSE);
 
-    ret = 0;
- end:
-    BN_free(bn);
-    return ret;
+	if (prime_config.generate != 0) {
+		if (prime_config.bits == 0) {
+			BIO_printf(bio_err, "Specify the number of bits.\n");
+			goto end;
+		}
+		bn = BN_new();
+		if (!bn) {
+			BIO_printf(bio_err, "Out of memory.\n");
+			goto end;
+		}
+		if (!BN_generate_prime_ex(bn, prime_config.bits,
+		    prime_config.safe, NULL, NULL, NULL)) {
+			BIO_printf(bio_err, "Prime generation error.\n");
+			goto end;
+		}
+		s = prime_config.hex ? BN_bn2hex(bn) : BN_bn2dec(bn);
+		if (s == NULL) {
+			BIO_printf(bio_err, "Out of memory.\n");
+			goto end;
+		}
+		BIO_printf(bio_out, "%s\n", s);
+		free(s);
+	} else {
+		if (prime_config.hex) {
+			if (!BN_hex2bn(&bn, prime)) {
+				BIO_printf(bio_err, "%s is an invalid hex "
+				    "value.\n", prime);
+				goto end;
+			}
+		} else {
+			if (!BN_dec2bn(&bn, prime)) {
+				BIO_printf(bio_err, "%s is an invalid decimal "
+				    "value.\n", prime);
+				goto end;
+			}
+		}
+
+		BIO_printf(bio_out, "%s is %sprime\n", prime,
+		    BN_is_prime_ex(bn, prime_config.checks,
+			NULL, NULL) ? "" : "not ");
+	}
+
+	ret = 0;
+
+end:
+	BN_free(bn);
+	BIO_free_all(bio_out);
+
+	return (ret);
 }
